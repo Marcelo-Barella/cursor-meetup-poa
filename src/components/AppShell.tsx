@@ -2,9 +2,9 @@ import Link from "next/link";
 import type { User } from "@supabase/supabase-js";
 
 const nav = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/ledger", label: "Ledger" },
-  { href: "/search", label: "Search" },
+  { href: "/dashboard", label: "Painel" },
+  { href: "/ledger", label: "Razão" },
+  { href: "/search", label: "Busca" },
 ];
 
 export function AppShell({
@@ -14,7 +14,7 @@ export function AppShell({
   user: User;
   children: React.ReactNode;
 }) {
-  const email = user.email ?? "signed in";
+  const email = user.email ?? "conectado";
   return (
     <div className="relative z-10 flex min-h-screen flex-col">
       <header className="border-b border-line bg-paper/80 backdrop-blur-md">
@@ -27,7 +27,7 @@ export function AppShell({
               Ledgerline
             </Link>
             <span className="hidden text-xs uppercase tracking-[0.2em] text-muted sm:inline">
-              finance demo
+              demo financeira
             </span>
           </div>
           <nav className="flex flex-wrap items-center gap-2 text-sm">
@@ -48,7 +48,7 @@ export function AppShell({
                 type="submit"
                 className="rounded-full border border-line px-3 py-1 text-ink transition hover:border-accent hover:text-accent"
               >
-                Sign out
+                Sair
               </button>
             </form>
           </div>

@@ -1,92 +1,92 @@
-# Ledgerline — finance SaaS demo
+# Ledgerline — demonstração SaaS financeira
 
-Next.js (App Router) + Supabase Auth + Postgres with row-level security, editorial “ledger tape” UI, and a bulk TypeScript seeder for MCP-scale querying (50k–200k+ rows).
+Next.js (App Router) + Supabase Auth + Postgres com segurança em nível de linha, interface editorial em “fita de razão” e um seeder em TypeScript em massa para consultas em escala MCP (50k–200k+ linhas).
 
-## Prerequisites
+## Pré-requisitos
 
 - Node 20+
-- [Supabase CLI](https://supabase.com/docs/guides/cli) (local stack or linked remote project)
-- Optional: Docker MCP gateway per `.cursor/mcp.json` for tool demos
+- [Supabase CLI](https://supabase.com/docs/guides/cli) (stack local ou projeto remoto vinculado)
+- Opcional: gateway MCP Docker conforme `.cursor/mcp.json` para demos de ferramentas
 
-## Environment
+## Ambiente
 
-Copy `.env.example` to `.env.local` for the web app:
+Copie `.env.example` para `.env.local` no app web:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Fill `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from the Supabase dashboard (Settings → API).
+Preencha `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` no painel do Supabase (Settings → API).
 
-For seeding, add:
+Para o seed, adicione:
 
-- `DATABASE_URL` — Postgres connection string (local: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`; hosted: use the pooler URI with `sslmode=require` if required).
-- `SUPABASE_SERVICE_ROLE_KEY` — only used if you extend the seeder to call the REST API; the script currently uses direct SQL via `pg`.
+- `DATABASE_URL` — string de conexão Postgres (local: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`; hospedado: URI do pooler com `sslmode=require` se necessário).
+- `SUPABASE_SERVICE_ROLE_KEY` — só usada se você estender o seeder para chamar a REST API; o script hoje usa SQL direto via `pg`.
 
-Optional tuning in `.env.local`:
+Ajustes opcionais em `.env.local`:
 
-- `SEED_TOTAL_TRANSACTIONS` (default `150000`, clamped 50k–200k)
-- `SEED_INVOICE_ROWS` (default `8000`)
-- `SEED_AUDIT_ROWS` (default `20000`)
+- `SEED_TOTAL_TRANSACTIONS` (padrão `150000`, limitado entre 50k–200k)
+- `SEED_INVOICE_ROWS` (padrão `8000`)
+- `SEED_AUDIT_ROWS` (padrão `20000`)
 
-## Database reset and migrations
+## Reset do banco e migrações
 
-**Local Supabase**
+**Supabase local**
 
 ```bash
 supabase start
 supabase db reset
 ```
 
-`db reset` applies everything under `supabase/migrations/`, including the fixed demo org (`demo-corp`, UUID `11111111-1111-1111-1111-111111111111`), enums, tables, RLS, grants, and `search_transactions` RPC.
+`db reset` aplica tudo em `supabase/migrations/`, incluindo a org demo fixa (`demo-corp`, UUID `11111111-1111-1111-1111-111111111111`), enums, tabelas, RLS, grants e a RPC `search_transactions`.
 
-**Remote project**
+**Projeto remoto**
 
 ```bash
-supabase link --project-ref <your-ref>
+supabase link --project-ref <sua-ref>
 supabase db push
 ```
 
-## Seed data (50k–200k rows)
+## Dados de seed (50k–200k linhas)
 
-After migrations:
+Após as migrações:
 
 ```bash
 npm install
 npm run db:seed
 ```
 
-The script truncates demo-org financial rows, recreates accounts/categories, bulk-inserts transactions in batches of 2,000, then invoices, balances, and audit rows. Progress prints to stdout.
+O script trunca linhas financeiras da org demo, recria contas/categorias, insere transações em lotes de 2.000, depois faturas, saldos e auditoria. O progresso aparece no stdout.
 
-## Run the app
+## Rodar o app
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`, sign up or sign in. New users are added to `profiles` and linked to the demo org via the `handle_new_user` trigger so RLS allows reads without a separate invite step.
+Abra `http://localhost:3000`, cadastre-se ou entre. Novos usuários entram em `profiles` e são vinculados à org demo pelo trigger `handle_new_user`, de modo que a RLS permita leituras sem fluxo de convite separado.
 
-## Pages
+## Páginas
 
-- `/dashboard` — counts, open invoice exposure, recent lines, audit tail
-- `/ledger` — paginated transactions
-- `/search` — full-text search via `search_transactions` (GIN on generated `tsvector`)
+- `/dashboard` — totais, exposição de faturas em aberto, linhas recentes, cauda de auditoria
+- `/ledger` — transações paginadas
+- `/search` — busca de texto completo via `search_transactions` (GIN em `tsvector` gerado)
 
-## Schema (Postgres)
+## Esquema (Postgres)
 
-| Table           | Purpose                                      |
+| Tabela          | Finalidade                                   |
 |-----------------|----------------------------------------------|
-| `orgs`          | Tenant                                       |
-| `org_members`   | User ↔ org membership (RLS driver)         |
-| `profiles`      | Display name keyed by `auth.users.id`        |
-| `accounts`      | GL / bank style accounts                     |
-| `categories`    | Hierarchical classification                  |
-| `transactions`  | Ledger lines + generated search vector       |
-| `invoices`      | AR-style documents                         |
-| `balances`      | Point-in-time balances per account           |
-| `audit_log`     | Append-only style events                     |
+| `orgs`          | Inquilino                                    |
+| `org_members`   | Associação usuário ↔ org (motor da RLS)    |
+| `profiles`      | Nome de exibição ligado a `auth.users.id`  |
+| `accounts`      | Contas estilo razão / banco                  |
+| `categories`    | Classificação hierárquica                    |
+| `transactions`  | Linhas do razão + vetor de busca gerado    |
+| `invoices`      | Documentos estilo contas a receber         |
+| `balances`      | Saldos por conta em um instante              |
+| `audit_log`     | Eventos em estilo somente acrescentar      |
 
-## Agent notes
+## Notas para agentes
 
-See `AGENTS.md` (Next.js version quirks) and `CLAUDE.md` (where queries and seeding live).
+Veja `AGENTS.md` (particularidades da versão do Next.js) e `CLAUDE.md` (onde ficam as queries e o seed).

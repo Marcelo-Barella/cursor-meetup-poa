@@ -15,7 +15,7 @@ as $$
     and (
       p_query is null
       or length(trim(p_query)) = 0
-      or t.search_vector @@ websearch_to_tsquery('english', p_query)
+      or t.search_vector @@ websearch_to_tsquery('portuguese', p_query)
     )
   order by t.posted_at desc, t.id
   limit greatest(1, least(p_limit, 200));

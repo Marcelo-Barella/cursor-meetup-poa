@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { faker } from "@faker-js/faker";
+import { fakerPT_BR as faker } from "@faker-js/faker";
 import pg from "pg";
 
 const DEMO_ORG_ID = "11111111-1111-1111-1111-111111111111";
@@ -18,7 +18,7 @@ function pick<T>(arr: T[]): T {
 async function main() {
   const url = process.env.DATABASE_URL;
   if (!url) {
-    throw new Error("DATABASE_URL is required for seeding");
+    throw new Error("DATABASE_URL é obrigatório para o seed");
   }
   const totalTx = Math.min(200_000, Math.max(50_000, num("SEED_TOTAL_TRANSACTIONS", 150_000)));
   const invoiceRows = Math.min(50_000, Math.max(2_000, num("SEED_INVOICE_ROWS", 8_000)));
@@ -28,7 +28,7 @@ async function main() {
   try {
     const orgCheck = await client.query(`select 1 from public.orgs where id = $1`, [DEMO_ORG_ID]);
     if (orgCheck.rowCount === 0) {
-      throw new Error("Demo org row missing. Apply supabase migrations first.");
+      throw new Error("Linha da org demo ausente. Aplique primeiro as migrações do Supabase.");
     }
     await client.query("begin");
     await client.query(`delete from public.audit_log where org_id = $1`, [DEMO_ORG_ID]);
@@ -41,18 +41,18 @@ async function main() {
     await client.query(`delete from public.categories where org_id = $1`, [DEMO_ORG_ID]);
     await client.query(`delete from public.accounts where org_id = $1`, [DEMO_ORG_ID]);
     const accountSpecs: { name: string; type: string }[] = [
-      { name: "Operating — Primary", type: "checking" },
-      { name: "Operating — Reserve", type: "checking" },
-      { name: "Payroll Clearing", type: "checking" },
-      { name: "Corporate Card", type: "credit" },
-      { name: "Treasury MMF", type: "savings" },
-      { name: "AR — SaaS", type: "revenue" },
-      { name: "AR — Services", type: "revenue" },
-      { name: "AP — Vendors", type: "expense_other" },
+      { name: "Operacional — Principal", type: "checking" },
+      { name: "Operacional — Reserva", type: "checking" },
+      { name: "Liquidação de folha", type: "checking" },
+      { name: "Cartão corporativo", type: "credit" },
+      { name: "Tesouraria — fundo MM", type: "savings" },
+      { name: "Contas a receber — SaaS", type: "revenue" },
+      { name: "Contas a receber — Serviços", type: "revenue" },
+      { name: "Contas a pagar — Fornecedores", type: "expense_other" },
       { name: "Intercompany", type: "checking" },
-      { name: "FX — USD", type: "checking" },
-      { name: "FX — EUR", type: "checking" },
-      { name: "Petty Cash", type: "checking" },
+      { name: "Câmbio — USD", type: "checking" },
+      { name: "Câmbio — EUR", type: "checking" },
+      { name: "Caixa pequeno", type: "checking" },
     ];
     const accountIds: string[] = [];
     for (const a of accountSpecs) {
@@ -64,12 +64,12 @@ async function main() {
       accountIds.push(r.rows[0].id as string);
     }
     const topCategories = [
-      { name: "Revenue", kind: "income" },
-      { name: "Payroll", kind: "expense" },
-      { name: "Cloud & Infra", kind: "expense" },
-      { name: "Sales & Marketing", kind: "expense" },
-      { name: "G&A", kind: "expense" },
-      { name: "Transfers", kind: "transfer" },
+      { name: "Receita", kind: "income" },
+      { name: "Folha de pagamento", kind: "expense" },
+      { name: "Nuvem e infraestrutura", kind: "expense" },
+      { name: "Vendas e marketing", kind: "expense" },
+      { name: "Administrativo", kind: "expense" },
+      { name: "Transferências", kind: "transfer" },
     ];
     const categoryIds: string[] = [];
     for (const c of topCategories) {
@@ -101,15 +101,15 @@ async function main() {
     const statusChoices = ["posted", "posted", "posted", "pending"] as const;
     const templates = [
       "ACH {verb} {company}",
-      "Wire to {company}",
-      "Card charge — {company}",
-      "Invoice {num} — {company}",
-      "Payroll run {date}",
-      "SaaS subscription — {company}",
-      "Travel — {city}",
-      "Benefits — {company}",
-      "FX reval — {currency}",
-      "Interest {dir}",
+      "Transferência para {company}",
+      "Cobrança no cartão — {company}",
+      "Nota fiscal {num} — {company}",
+      "Folha de pagamento {date}",
+      "Assinatura SaaS — {company}",
+      "Viagem — {city}",
+      "Benefícios — {company}",
+      "Reavaliação cambial — {currency}",
+      "Juros ({dir})",
     ];
     const batch = 2000;
     let inserted = 0;
@@ -127,13 +127,13 @@ async function main() {
         const amount = (isInflow ? 1 : -1) * magnitude;
         const tpl = pick(templates);
         const desc = faker.helpers.mustache(tpl, {
-          verb: pick(["credit", "debit", "return"]),
+          verb: pick(["crédito", "débito", "estorno"]),
           company: faker.company.name(),
           num: String(faker.number.int({ min: 10000, max: 99999 })),
           date: postedStr,
           city: faker.location.city(),
           currency: pick(["USD", "EUR", "GBP"]),
-          dir: pick(["credit", "debit"]),
+          dir: pick(["crédito", "débito"]),
         });
         const memo = Math.random() < 0.35 ? faker.finance.transactionDescription() : null;
         const ext = Math.random() < 0.25 ? `REF-${faker.string.alphanumeric(10).toUpperCase()}` : null;
@@ -162,7 +162,7 @@ async function main() {
         values
       );
       inserted += slice;
-      process.stdout.write(`\rtransactions ${inserted}/${totalTx}`);
+      process.stdout.write(`\rtransações ${inserted}/${totalTx}`);
     }
     process.stdout.write("\n");
     for (let i = 0; i < invoiceRows; i++) {
@@ -206,7 +206,7 @@ async function main() {
          values ($1,null,$2,$3,gen_random_uuid(),$4::jsonb)`,
         [
           DEMO_ORG_ID,
-          pick(["row.view", "export.csv", "policy.check", "rpc.call", "seed.batch"]),
+          pick(["visualizacao.linha", "exportacao.csv", "politica.verificacao", "rpc.chamada", "seed.lote"]),
           pick(["transaction", "invoice", "account", "category", "balance"]),
           JSON.stringify({ batch: Math.floor(i / 500), host: faker.internet.domainName() }),
         ]

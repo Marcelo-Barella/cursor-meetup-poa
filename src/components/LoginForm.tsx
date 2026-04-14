@@ -22,7 +22,7 @@ export function LoginForm() {
         setMessage(error.message);
         return;
       }
-      setMessage("Check your email to confirm, or sign in if confirmations are disabled.");
+      setMessage("Verifique seu e-mail para confirmar, ou entre se as confirmações estiverem desativadas.");
       return;
     }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -37,7 +37,7 @@ export function LoginForm() {
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <label className="text-xs uppercase tracking-widest text-muted">
-        Email
+        E-mail
         <input
           type="email"
           required
@@ -47,7 +47,7 @@ export function LoginForm() {
         />
       </label>
       <label className="text-xs uppercase tracking-widest text-muted">
-        Password
+        Senha
         <input
           type="password"
           required
@@ -67,7 +67,7 @@ export function LoginForm() {
               : "border border-line bg-white/50 text-muted"
           }`}
         >
-          Sign in
+          Entrar
         </button>
         <button
           type="button"
@@ -78,7 +78,7 @@ export function LoginForm() {
               : "border border-line bg-white/50 text-muted"
           }`}
         >
-          Sign up
+          Cadastrar
         </button>
       </div>
       <button
@@ -86,7 +86,7 @@ export function LoginForm() {
         disabled={loading}
         className="rounded-full bg-accent-hot px-4 py-2.5 text-sm font-medium text-paper transition hover:opacity-90 disabled:opacity-50"
       >
-        {loading ? "Working..." : mode === "signup" ? "Create account" : "Enter workspace"}
+        {loading ? "Aguarde..." : mode === "signup" ? "Criar conta" : "Acessar área de trabalho"}
       </button>
       {message ? <p className="text-xs text-muted">{message}</p> : null}
     </form>

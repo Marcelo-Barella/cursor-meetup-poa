@@ -1,0 +1,13 @@
+---
+description: Migrações Postgres, RLS e padrões de acesso privilegiado no Supabase
+globs:
+  - supabase/migrations/**/*.sql
+  - scripts/**/*.ts
+alwaysApply: false
+---
+
+# SQL e ferramentas de banco
+
+- Novas tabelas voltadas ao usuário em `public` precisam de **RLS ativado** e políticas coerentes com a filiação à organização; siga os padrões das migrações existentes em vez de deixar tabelas abertas.
+- Prefira grants e políticas explícitos alinhados a como a aplicação consulta (`org_id`, membership). Evite helpers `SECURITY DEFINER` salvo quando necessário; se usar, documente a intenção e restrinja `search_path` / checagens de papel.
+- Scripts de seed em massa ou administração podem usar Postgres direto (`pg`, `DATABASE_URL`) ou service role fora do RLS; restrinja isso a `scripts/` e ambientes controlados — nunca ligue service role ao cliente Next.js nem a módulos de servidor compartilhados usados por páginas.

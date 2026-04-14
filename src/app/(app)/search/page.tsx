@@ -10,40 +10,40 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
   const supabase = await createSupabaseServerClient();
   const orgId = await getDemoOrgId(supabase);
   if (!orgId) {
-    return <p className="text-sm text-muted">Demo org missing.</p>;
+    return <p className="text-sm text-muted">Organização demo ausente.</p>;
   }
   const results = q ? await searchTransactionsRpc(supabase, orgId, q, 80) : [];
   return (
     <div className="space-y-8">
       <header className="animate-rise">
-        <p className="text-xs uppercase tracking-[0.24em] text-muted">Search</p>
-        <h1 className="mt-2 font-display text-4xl">Full-text ledger probe</h1>
+        <p className="text-xs uppercase tracking-[0.24em] text-muted">Busca</p>
+        <h1 className="mt-2 font-display text-4xl">Busca de texto completo no razão</h1>
         <p className="mt-2 max-w-xl text-sm text-muted">
-          Uses <code className="text-ink">search_transactions</code> with a generated{" "}
-          <code className="text-ink">tsvector</code> column — tuned for MCP-scale row counts.
+          Usa <code className="text-ink">search_transactions</code> com coluna gerada{" "}
+          <code className="text-ink">tsvector</code> — ajustada para volumes de linhas em escala MCP.
         </p>
       </header>
       <form className="animate-rise-delay flex flex-wrap gap-3" action="/search" method="get">
         <input
           name="q"
           defaultValue={q}
-          placeholder="Try: payroll, wire, SaaS, travel…"
+          placeholder="Ex.: folha, transferência, SaaS, viagem…"
           className="min-w-[240px] flex-1 rounded-2xl border border-line bg-white/80 px-4 py-3 text-sm outline-none ring-accent/20 focus:ring-2"
         />
         <button
           type="submit"
           className="rounded-full bg-ink px-6 py-3 text-sm font-medium text-paper hover:opacity-90"
         >
-          Run search
+          Buscar
         </button>
       </form>
       {!q ? (
-        <p className="text-sm text-muted">Enter a query to scan descriptions, memos, and references.</p>
+        <p className="text-sm text-muted">Digite um termo para varrer descrições, memorandos e referências.</p>
       ) : (
         <ul className="space-y-3 animate-rise">
           {results.length === 0 ? (
             <li className="rounded-2xl border border-dashed border-line px-4 py-6 text-sm text-muted">
-              No matches for &quot;{q}&quot;.
+              Nenhum resultado para &quot;{q}&quot;.
             </li>
           ) : (
             results.map((row) => (

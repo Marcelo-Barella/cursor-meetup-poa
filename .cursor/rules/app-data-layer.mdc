@@ -1,0 +1,14 @@
+---
+description: Consultas Supabase com escopo de org e convenções da org demo nas páginas
+globs:
+  - src/lib/data/**/*.ts
+  - src/app/**/*.tsx
+alwaysApply: false
+---
+
+# Acesso a dados na aplicação
+
+- Adicione ou estenda helpers de consulta em `src/lib/data/finance.ts` (ou módulos colocados em `src/lib/data/`) e passe um `SupabaseClient` mais `orgId` de `getDemoOrgId()` quando a UI for por organização.
+- Resolva a org demo com `getDemoOrgId(client)`; o slug `demo-corp` está definido nas migrações e deve permanecer alinhado a `finance.ts`.
+- Toda consulta que lê dados da org deve filtrar por `org_id` (RLS não substitui uma forma clara de consulta no código da aplicação).
+- Para linhas tipadas/geradas, prefira tipos de `src/lib/supabase/types` quando existirem para a tabela em questão.

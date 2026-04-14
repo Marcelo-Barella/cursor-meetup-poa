@@ -69,7 +69,7 @@ create table public.transactions (
   status public.transaction_status not null default 'posted',
   search_vector tsvector generated always as (
     to_tsvector(
-      'english',
+      'portuguese',
       coalesce(description, '') || ' ' || coalesce(memo, '') || ' ' || coalesce(external_ref, '')
     )
   ) stored,

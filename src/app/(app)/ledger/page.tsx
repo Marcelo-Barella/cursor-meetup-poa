@@ -11,7 +11,7 @@ export default async function LedgerPage({ searchParams }: { searchParams: Searc
   const supabase = await createSupabaseServerClient();
   const orgId = await getDemoOrgId(supabase);
   if (!orgId) {
-    return <p className="text-sm text-muted">Demo org missing. Run migrations.</p>;
+    return <p className="text-sm text-muted">Organização demo ausente. Execute as migrações.</p>;
   }
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
@@ -36,22 +36,22 @@ export default async function LedgerPage({ searchParams }: { searchParams: Searc
   return (
     <div className="space-y-8">
       <header className="animate-rise">
-        <p className="text-xs uppercase tracking-[0.24em] text-muted">Ledger</p>
-        <h1 className="mt-2 font-display text-4xl">Chronological truth</h1>
+        <p className="text-xs uppercase tracking-[0.24em] text-muted">Razão</p>
+        <h1 className="mt-2 font-display text-4xl">Registro cronológico</h1>
         <p className="mt-2 max-w-xl text-sm text-muted">
-          Page {page} of {totalPages.toLocaleString()} — {total.toLocaleString()} rows visible under your
-          session.
+          Página {page} de {totalPages.toLocaleString("pt-BR")} — {total.toLocaleString("pt-BR")} linhas
+          visíveis na sua sessão.
         </p>
       </header>
       <div className="overflow-hidden rounded-3xl border border-line bg-white/80 shadow-sm animate-rise-delay">
         <table className="w-full border-collapse text-left text-sm">
           <thead className="bg-paper/90 text-xs uppercase tracking-widest text-muted">
             <tr>
-              <th className="px-4 py-3">Posted</th>
-              <th className="px-4 py-3">Account</th>
-              <th className="px-4 py-3">Category</th>
-              <th className="px-4 py-3">Description</th>
-              <th className="px-4 py-3 text-right">Amount</th>
+              <th className="px-4 py-3">Data</th>
+              <th className="px-4 py-3">Conta</th>
+              <th className="px-4 py-3">Categoria</th>
+              <th className="px-4 py-3">Descrição</th>
+              <th className="px-4 py-3 text-right">Valor</th>
             </tr>
           </thead>
           <tbody>
@@ -81,7 +81,7 @@ export default async function LedgerPage({ searchParams }: { searchParams: Searc
             className="rounded-full border border-line px-4 py-2 hover:bg-white/70"
             href={`/ledger?page=${page - 1}`}
           >
-            Previous
+            Anterior
           </a>
         ) : null}
         {page < totalPages ? (
@@ -89,7 +89,7 @@ export default async function LedgerPage({ searchParams }: { searchParams: Searc
             className="rounded-full border border-line px-4 py-2 hover:bg-white/70"
             href={`/ledger?page=${page + 1}`}
           >
-            Next
+            Próxima
           </a>
         ) : null}
       </div>

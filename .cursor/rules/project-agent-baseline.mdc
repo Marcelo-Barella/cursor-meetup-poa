@@ -1,0 +1,9 @@
+---
+description: Contexto base do agente para este repositório — verificação e padrões
+alwaysApply: true
+---
+
+# Linha de base do projeto
+
+- Antes de considerar uma tarefa concluída, execute `npm run lint` e `npm run build` quando a alteração afetar código de aplicação ou configuração coberta por esses comandos.
+- Não commite segredos: nada de `.env.local`, chaves reais nem URIs com credenciais no repositório.
